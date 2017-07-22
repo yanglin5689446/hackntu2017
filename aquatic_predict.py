@@ -6,8 +6,9 @@ import json
 from bs4 import BeautifulSoup as BS
 import numpy as np
 from sklearn.svm import SVR
-import matplotlib.pyplot as plt
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import time
 import datetime
 import base64

@@ -6,12 +6,14 @@ import json
 from bs4 import BeautifulSoup as BS
 import numpy as np
 from sklearn.svm import SVR
-import matplotlib.pyplot as plt
 import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import time
 import datetime
 import base64
 import hashlib
+from matplotlib.font_manager import FontProperties
 
 def predict(market_name='台中市', target_level="規格豬(75公斤以上)", start=360, predict_days=30, C=1e1):
     filename = hashlib.md5((market_name+str(target_level)+str(start)+str(C)).encode('utf-8')).hexdigest()
@@ -50,15 +52,18 @@ def predict(market_name='台中市', target_level="規格豬(75公斤以上)", s
     y_rbf = svr_rbf.fit(day, prices).predict(day)
     predict_result = svr_rbf.predict(future_day)
 
-    lw = 2 
+    ChineseFont1 = FontProperties(fname = './NotoSans.otf');
+
+    lw = 2
+    plt.cla(); 
     plt.scatter(day, prices, color='darkorange', label='data')
-    plt.plot(day, y_rbf, color='navy', lw=lw, label=u'近似曲線')
-    plt.plot(future_day, predict_result, color='r', lw=lw, label=u'預測')
+    plt.plot(day, y_rbf, color='navy', lw=lw)
+    plt.plot(future_day, predict_result, color='r', lw=lw)
     plt.xticks(intervals, [date[i].strftime('%m/%d') for i in intervals])
     plt.xlabel('data')
-    plt.ylabel(u'價格')
-    plt.title(u'預測與實際誤差')
-    plt.legend()
+    plt.ylabel(u'價格', fontproperties = ChineseFont1)
+    plt.title(u'預測與實際誤差', fontproperties = ChineseFont1)
+    plt.legend(['近似曲線','預測'], prop=ChineseFont1);
     plt.savefig(prefix + filename+'.png')
     return {'filepath': prefix+filename+'.png'}
 
