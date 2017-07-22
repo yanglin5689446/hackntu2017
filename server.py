@@ -8,6 +8,7 @@ from flask.json import jsonify
 from flask_cache import Cache
 from flask import Flask, session
 from flask_session import Session
+import info
 import aquatic_predict
 import poultry_predict
 import pig_predict
@@ -24,6 +25,9 @@ def index():
 @app.route('/plot/<path:path>')
 def send_js(path):
     return send_from_directory('plot', path)
+@app.route('/api/pig/info', methods = ['get'])
+def pig_info():
+    return jsonify(info.pig_info)
 
 @app.route('/api/pig', methods = ['post'])
 def predict_pig():
@@ -38,6 +42,10 @@ def predict_pig():
     result = pig_predict.predict(market_name=market, target_level=type_name, start=period, predict_days=predict_days)
     return jsonify(result)
 
+@app.route('/api/poultry/info', methods = ['get'])
+def poultry_info():
+    return jsonify(info.poultry_info)
+
 @app.route('/api/poultry', methods = ['post'])
 def predict_poultry():
     request_json = request.get_json()
@@ -49,6 +57,10 @@ def predict_poultry():
         return jsonify({"Error": 'data not provided.'})
     result = poultry_predict.predict(target=type_name, start=period, predict_days=predict_days)
     return jsonify(result)
+
+@app.route('/api/aquatic/info', methods = ['get'])
+def aquatic_info():
+    return jsonify(info.aquatic_info)
 
 @app.route('/api/aquatic', methods = ['post'])
 def predict_aquatic():
