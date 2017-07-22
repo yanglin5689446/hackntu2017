@@ -60,13 +60,12 @@ def predict_pig():
     try:
         market = request_json['market']
         type_name = request_json['type_name']
-        period = request_json['period']
-        predict_days = request_json['predict_days']
+        period = int(request_json['period'])
+        predict_days = int(request_json['predict_days'])
     except:
         return jsonify({"Error": "data not provided."})
-    #result = pig_predict.predict(market_name=market, target_level=type_name, start=period, predict_days=predict_days)
-    #return jsonify(result)
-    return jsonify({'abc': 'cde'})
+    result = pig_predict.predict(market_name=market, target_level=type_name, start=period, predict_days=predict_days)
+    return jsonify(result)
 
 @app.route('/api/poultry/info', methods = ['get'])
 def poultry_info():
