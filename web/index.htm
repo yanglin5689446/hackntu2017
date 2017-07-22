@@ -23,17 +23,39 @@
 
     function compute(target){
       t = target.id.split('_')
-      period = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_start`).value
-      predict = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_predict`).value
+
       switch(t[0]){
         case 'pig':
-        
-          fetch('http://localhost:9487/api/pig/', {
+          period = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_start`).value
+          predict = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_predict`).value
+          console.log({
+              market: pig_markets[t[1]], 
+              type_name: t[2], 
+              period: period,
+              predict_days: predict
+            })
+          fetch('http://floatflower.com.tw:9487/api/pig', {
             headers: {
+              'Content-Type': 'application/json'
             },
             method: "POST",
             body: JSON.stringify({
               market: pig_markets[t[1]], 
+              type_name: pig_levels[t[2]], 
+              period: period,
+              predict_days: predict
+            })
+          })
+          .then(response => response.json())
+          .then(json => $('#list_container').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` ))
+          break
+        case 'poultry':
+          period = document.getElementById(`${t[0]}_${t[1]}_start`).value
+          predict = document.getElementById(`${t[0]}_${t[1]}_predict`).value
+          fetch('http://floatflower.com.tw:9487//api/poultry/', {
+            
+            method: "POST",
+            body: JSON.stringify({
               type_name: t[2], 
               period: period,
               predict_days: predict
@@ -42,30 +64,60 @@
           .then(response => response.json())
           .then(json => console.log(json))
           break
-          
-        case 'poultry':
         case 'aquatic':
       }
     }
 
-    let pig_template = (feat, index, index1, min_start, max_start, min_predict, max_predict) => 
+    let pig_template = (index, index1, min_start, max_start, min_predict, max_predict) => 
     `
       <div class="params">
         <h3>取樣時間</h3>
         <p class="range-field" >
-          <input type="range" id="${feat}_${index}_${index1}_start" min="${min_start}" max="${max_start}" />
+          <input type="range" id="pig_${index}_${index1}_start" min="${min_start}" max="${max_start}" value="90" step="10"/>
         </p>
         <h3>預測時間</h3>
         <p class="range-field" >
-          <input type="range" id="${feat}_${index}_${index1}_predict" min="${min_predict}" max="${max_predict}" />
+          <input type="range" id="pig_${index}_${index1}_predict" min="${min_predict}" max="${max_predict}" value="7"/>
         </p>
-        <button class="btn waves-effect waves-light" name="action" id="${feat}_${index}_${index1}_submit" onclick="compute(this)">Submit
+        <button class="btn waves-effect waves-light" name="action" id="pig_${index}_${index1}_submit" onclick="compute(this)">Submit
+          <i class="material-icons right">send</i>
+        </button>
+      </div>
+    `
+    let poultry_template = (index, min_start, max_start, min_predict, max_predict) => 
+    `
+      <div class="params">
+        <h3>取樣時間</h3>
+        <p class="range-field" >
+          <input type="range" id="poultry_${index}_start" min="${min_start}" max="${max_start}" value="90" step="10"/>
+        </p>
+        <h3>預測時間</h3>
+        <p class="range-field" >
+          <input type="range" id="poultry_${index}_predict" min="${min_predict}" max="${max_predict}" value="7"/>
+        </p>
+        <button class="btn waves-effect waves-light" name="action" id="poultry_${index}_submit" onclick="compute(this)">Submit
+          <i class="material-icons right">send</i>
+        </button>
+      </div>
+    `
+    let aquatic_template = (index, index1, min_start, max_start, min_predict, max_predict) => 
+    `
+      <div class="params">
+        <h3>取樣時間</h3>
+        <p class="range-field" >
+          <input type="range" id="aquatic_${index}_start" min="${min_start}" max="${max_start}" value="90" step="10"/>
+        </p>
+        <h3>預測時間</h3>
+        <p class="range-field" >
+          <input type="range" id="aquatic_${index}_predict" min="${min_predict}" max="${max_predict}" value="7"/>
+        </p>
+        <button class="btn waves-effect waves-light" name="action" id="aquatic_${index}_submit" onclick="compute(this)">Submit
           <i class="material-icons right">send</i>
         </button>
       </div>
     `
     $(document).ready(function(){
-        fetch('http://localhost:9487/api/pig/info')
+        fetch('http://floatflower.com.tw:9487/api/pig/info')
         .then(response => response.json())
         .then(json => {
           pig_markets = json.market
@@ -86,7 +138,7 @@
             $(`#pig_${index}`).append(collapsible1)
             
             json.level.map((value1, index1) => {
-              $(collapsible1).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value1}</div><div class="collapsible-body"><span>${pig_template("pig",index, index1,1,360,1,90)}</span></div></li>`)
+              $(collapsible1).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value1}</div><div class="collapsible-body"><span>${pig_template(index, index1,1,360,1,90)}</span></div></li>`)
             })
             $(collapsible1).collapsible().trigger("create")
 
@@ -94,9 +146,40 @@
           $(collapsible).collapsible().trigger("create")
         })
 
-        $('#search').on('keypress', function(key){
-          console.log(key.key)
+        fetch('http://floatflower.com.tw:9487/api/poultry/info')
+        .then(response => response.json())
+        .then(json => {
+          pig_targets = json
+          let collapsible = document.createElement('ul')
+          collapsible.classList.add('collapsible')
+          collapsible.classList.add('popout')
+          collapsible.dataset.collapsible = 'accordion'
+          $('#poultry').append(collapsible)
+            
+          json.map((value, index) => {
+            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 1,180,1,90)}</span></div></li>`)
+          })
+
+          $(collapsible).collapsible().trigger("create")
         })
+
+        fetch('http://floatflower.com.tw:9487/api/aquatic/info')
+        .then(response => response.json())
+        .then(json => {
+          aquatic_markets = json.market
+          aquatic_type = json.type_name
+          let collapsible = document.createElement('ul')
+          collapsible.classList.add('collapsible')
+          collapsible.classList.add('popout')
+          collapsible.dataset.collapsible = 'accordion'
+          $('#aquatic').append(collapsible)
+          
+          json.market.map((value, index) => {
+            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 1,180,1,90)}</span></div></li>`)
+          })
+          $(collapsible).collapsible().trigger("create")
+        })
+
         $('.collapsible').collapsible()
 
     });
@@ -114,7 +197,7 @@
 				<label for="icon_prefix">作物、畜產、家禽、水產查詢</label>
 			</div>
 		</div>
-		<div class="list-container">
+		<div class="list-container" id="list_container">
   		<ul class="collapsible popout" data-collapsible="accordion">
         <li>
           <div class="collapsible-header"><i class="material-icons">stars</i>毛豬</div>
