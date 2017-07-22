@@ -8,6 +8,7 @@ from flask.json import jsonify
 from flask_cache import Cache
 from flask import Flask, session
 from flask_session import Session
+from flask_cors import CORS, cross_origin
 import info
 import aquatic_predict
 import poultry_predict
@@ -15,8 +16,32 @@ import pig_predict
 
 
 app = Flask(__name__)
-api = Api(app)
-sess = Session()
+
+@app.before_request
+def option_autoreply():
+    """ Always reply 200 on OPTIONS request """
+
+    if request.method == 'OPTIONS':
+        resp = app.make_default_options_response()
+
+        headers = None
+        if 'ACCESS_CONTROL_REQUEST_HEADERS' in request.headers:
+            headers = request.headers['ACCESS_CONTROL_REQUEST_HEADERS']
+
+        h = resp.headers
+
+        # Allow the origin which made the XHR
+        h['Access-Control-Allow-Origin'] = request.headers['Origin']
+        # Allow the actual method
+        h['Access-Control-Allow-Methods'] = request.headers['Access-Control-Request-Method']
+        # Allow for 10 seconds
+        h['Access-Control-Max-Age'] = "10"
+
+        # We also keep current headers
+        if headers is not None:
+            h['Access-Control-Allow-Headers'] = headers
+
+        return resp
 
 @app.route('/')
 def index():
@@ -29,7 +54,7 @@ def send_js(path):
 def pig_info():
     return jsonify(info.pig_info)
 
-@app.route('/api/pig', methods = ['post'])
+@app.route('/api/pig', methods = ['POST'])
 def predict_pig():
     request_json = request.get_json()
     try:
@@ -38,9 +63,10 @@ def predict_pig():
         period = request_json['period']
         predict_days = request_json['predict_days']
     except:
-        return jsonify({"Error": 'data not provided.'})
-    result = pig_predict.predict(market_name=market, target_level=type_name, start=period, predict_days=predict_days)
-    return jsonify(result)
+        return jsonify({"Error": "data not provided."})
+    #result = pig_predict.predict(market_name=market, target_level=type_name, start=period, predict_days=predict_days)
+    #return jsonify(result)
+    return jsonify({'abc': 'cde'})
 
 @app.route('/api/poultry/info', methods = ['get'])
 def poultry_info():
@@ -75,9 +101,18 @@ def predict_aquatic():
     result = aquatic_predict.predict(market_name=market, target=type_name, start=period, predict_days=predict_days)
     return jsonify(result)
 
+@app.after_request
+def set_allow_origin(resp):
+    """ Set origin for GET, POST, PUT, DELETE requests """
+
+    h = resp.headers
+
+    # Allow crossdomain for other HTTP Verbs
+    if request.method != 'OPTIONS' and 'Origin' in request.headers:
+        h['Access-Control-Allow-Origin'] = request.headers['Origin']
+    return resp
+
 if __name__ == '__main__':
     app.secret_key = 'hackntu948794crazy'
-    app.config['SESSION_TYPE'] = 'filesystem'
-    sess.init_app(app)
 
     app.run(host="0.0.0.0", port=9487, debug=True)

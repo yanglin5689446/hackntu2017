@@ -1,0 +1,51 @@
+body {
+  background-color: #EEEEEE; }
+
+.content-container {
+  background-color: white;
+  position: relative;
+  margin: auto;
+  top: -120px;
+  width: 700px;
+  min-height: 100vh; }
+  .content-container .search-field {
+    margin: auto;
+    position: relative;
+    top: 40px;
+    width: 400px; }
+  .content-container .list-container {
+    position: relative;
+    top: 60px;
+    margin: auto;
+    width: 80%; }
+
+.appbar {
+  height: 200px;
+  background-color: #7CB342; }
+  .appbar h1 {
+    display: block;
+    padding: 20px;
+    color: #FAFAFA;
+    line-height: 60px;
+    margin: 0px;
+    font-size: 28px; }
+
+.collapsible {
+  margin: 0px; }
+
+.collapsible-header {
+  background-color: #F5F5F5; }
+
+.collapsible-body {
+  background-color: #E0E0E0;
+  padding: 0px; }
+
+.params {
+  width: 80%;
+  margin: auto;
+  padding: 20px;
+  padding-bottom: 30px; }
+  .params h3 {
+    font-size: 20px; }
+
+/*# sourceMappingURL=main.css.map */

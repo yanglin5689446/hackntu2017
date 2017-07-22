@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template</title>
+    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css" rel="stylesheet" >
+  	<!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+    <script>
+    var pig_markets, pig_levels;
+    var poultry_targets;
+    var aqauatic_markets, aquatic_levels;
+
+    function compute(target){
+      t = target.id.split('_')
+      period = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_start`).value
+      predict = document.getElementById(`${t[0]}_${t[1]}_${t[2]}_predict`).value
+      switch(t[0]){
+        case 'pig':
+        
+          fetch('http://localhost:9487/api/pig/', {
+            headers: {
+            },
+            method: "POST",
+            body: JSON.stringify({
+              market: pig_markets[t[1]], 
+              type_name: t[2], 
+              period: period,
+              predict_days: predict
+            })
+          })
+          .then(response => response.json())
+          .then(json => console.log(json))
+          break
+          
+        case 'poultry':
+        case 'aquatic':
+      }
+    }
+
+    let pig_template = (feat, index, index1, min_start, max_start, min_predict, max_predict) => 
+    `
+      <div class="params">
+        <h3>取樣時間</h3>
+        <p class="range-field" >
+          <input type="range" id="${feat}_${index}_${index1}_start" min="${min_start}" max="${max_start}" />
+        </p>
+        <h3>預測時間</h3>
+        <p class="range-field" >
+          <input type="range" id="${feat}_${index}_${index1}_predict" min="${min_predict}" max="${max_predict}" />
+        </p>
+        <button class="btn waves-effect waves-light" name="action" id="${feat}_${index}_${index1}_submit" onclick="compute(this)">Submit
+          <i class="material-icons right">send</i>
+        </button>
+      </div>
+    `
+    $(document).ready(function(){
+        fetch('http://localhost:9487/api/pig/info')
+        .then(response => response.json())
+        .then(json => {
+          pig_markets = json.market
+          pig_levels = json.level
+          let collapsible = document.createElement('ul')
+          collapsible.classList.add('collapsible')
+          collapsible.classList.add('popout')
+          collapsible.dataset.collapsible = 'accordion'
+          $('#live_stock').append(collapsible)
+          
+          json.market.map((value, index) => {
+            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span id="pig_${index}"></span></div></li>`)
+
+            let collapsible1 = document.createElement('ul')
+            collapsible1.classList.add('collapsible')
+            collapsible1.classList.add('popout')
+            collapsible1.dataset.collapsible = 'accordion'
+            $(`#pig_${index}`).append(collapsible1)
+            
+            json.level.map((value1, index1) => {
+              $(collapsible1).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value1}</div><div class="collapsible-body"><span>${pig_template("pig",index, index1,1,360,1,90)}</span></div></li>`)
+            })
+            $(collapsible1).collapsible().trigger("create")
+
+          })
+          $(collapsible).collapsible().trigger("create")
+        })
+
+        $('#search').on('keypress', function(key){
+          console.log(key.key)
+        })
+        $('.collapsible').collapsible()
+
+    });
+    </script>
+</head>
+<body>
+  <div class="appbar">
+    <h1>畜產作物行情與走勢分析</h1>
+	</div>
+	<div class="content-container card">
+		<div class="search-field">
+			<div class="input-field col s6">
+				<i class="material-icons prefix">search</i>
+				<input id="search" type="text" class="validate"/>
+				<label for="icon_prefix">作物、畜產、家禽、水產查詢</label>
+			</div>
+		</div>
+		<div class="list-container">
+  		<ul class="collapsible popout" data-collapsible="accordion">
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>毛豬</div>
+          <div class="collapsible-body"><span id="live_stock"></span></div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>家禽</div>
+          <div class="collapsible-body"><span id="poultry"></span></div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>水產</div>
+          <div class="collapsible-body"><span id="aquatic"></span></div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>蔬菜</div>
+          <div class="collapsible-body"><span id="vegetable"></span></div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>水果</div>
+          <div class="collapsible-body"><span id="fruites"></span></div>
+        </li>
+        <li>
+          <div class="collapsible-header"><i class="material-icons">stars</i>花卉</div>
+          <div class="collapsible-body"><span id="flower"></span></div>
+        </li>
+      </ul>
+		</div>
+	</div>
+</body>
+</html>
+
