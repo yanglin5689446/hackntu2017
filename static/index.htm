@@ -47,7 +47,11 @@
             })
           })
           .then(response => response.json())
-          .then(json => $('#list_container').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` ))
+          .then(json => {
+            $('#list_container').css('display', 'none')
+            $('#image_field').css('display', 'block')
+            $('#image').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` )
+          })
           break
         case 'poultry':
           period = document.getElementById(`${t[0]}_${t[1]}_start`).value
@@ -64,7 +68,11 @@
             })
           })
           .then(response => response.json())
-          .then(json => $('#list_container').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` ))
+          .then(json => {
+            $('#list_container').css('display', 'none')
+            $('#image_field').css('display', 'block')
+            $('#image').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` )
+          })
           break
         case 'aquatic':
       }
@@ -159,7 +167,7 @@
           $('#poultry').append(collapsible)
             
           json.map((value, index) => {
-            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 1,180,1,90)}</span></div></li>`)
+            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 10,180,1,90)}</span></div></li>`)
           })
 
           $(collapsible).collapsible().trigger("create")
@@ -177,12 +185,16 @@
           $('#aquatic').append(collapsible)
           
           json.market.map((value, index) => {
-            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 1,180,1,90)}</span></div></li>`)
+            $(collapsible).append(`<li><div class="collapsible-header"><i class="material-icons">stars</i>${value}</div><div class="collapsible-body"><span>${poultry_template(index, 10,180,1,90)}</span></div></li>`)
           })
           $(collapsible).collapsible().trigger("create")
         })
 
         $('.collapsible').collapsible()
+        $('#return').on('click', () => {
+          $('#list_container').css('display', 'block')
+          $('#image_field').css('display', 'none')
+        })
 
     });
     </script>
@@ -199,6 +211,12 @@
 				<label for="icon_prefix">作物、畜產、家禽、水產查詢</label>
 			</div>
 		</div>
+    <div id="image_field" style="display:none">
+      <div id="image"></div>
+      <div style="margin: 30px;padding-bottom: 30px;">
+        <a class="btn-floating btn-large waves-effect waves-light cyan" id="return"><i class="material-icons">undo</i></a>
+      </div>
+    </div>
 		<div class="list-container" id="list_container">
   		<ul class="collapsible popout" data-collapsible="accordion">
         <li>
@@ -228,6 +246,31 @@
       </ul>
 		</div>
 	</div>
+	<footer class="page-footer">
+		<div class="container">
+			<div class="row">
+				<div class="col l6 s12">
+					<h5 class="white-text">Footer Content</h5>
+					<p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+				</div>
+				<div class="col l4 offset-l2 s12">
+					<h5 class="white-text">Links</h5>
+					<ul>
+						<li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+						<li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="footer-copyright">
+			<div class="container">
+			© 2017 Copyright Text
+			<a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+			</div>
+		</div>
+	</footer>
 </body>
 </html>
 

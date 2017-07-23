@@ -8,7 +8,7 @@ body{
     margin: auto;
     top: -120px;
     width: 700px;
-    min-height: 100vh;
+    min-height: 700px;
     .search-field{
         margin: auto;
         position:relative;
@@ -21,6 +21,9 @@ body{
         margin: auto;	
         width: 80%;
     }
+}
+.page-footer{
+    background-color: #7CB342;
 }
 
 .appbar{
