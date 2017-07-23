@@ -43,10 +43,6 @@ def option_autoreply():
 
         return resp
 
-@app.route('/')
-def index():
-    return "Happy hacking!"
-
 @app.route('/plot/<path:path>')
 def send_js(path):
     return send_from_directory('plot', path)
@@ -71,13 +67,13 @@ def predict_pig():
 def poultry_info():
     return jsonify(info.poultry_info)
 
-@app.route('/api/poultry', methods = ['post'])
+@app.route('/api/poultry', methods = ['POST'])
 def predict_poultry():
     request_json = request.get_json()
     try:
         type_name = request_json['type_name']
-        period = request_json['period']
-        predict_days = request_json['predict_days']
+        period = int(request_json['period'])
+        predict_days = int(request_json['predict_days'])
     except:
         return jsonify({"Error": 'data not provided.'})
     result = poultry_predict.predict(target=type_name, start=period, predict_days=predict_days)

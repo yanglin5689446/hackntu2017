@@ -52,17 +52,19 @@
         case 'poultry':
           period = document.getElementById(`${t[0]}_${t[1]}_start`).value
           predict = document.getElementById(`${t[0]}_${t[1]}_predict`).value
-          fetch('http://floatflower.com.tw:9487//api/poultry/', {
-            
+          fetch('http://floatflower.com.tw:9487/api/poultry', {
+            headers: {
+              'Content-Type': 'application/json'
+            },
             method: "POST",
             body: JSON.stringify({
-              type_name: t[2], 
+              type_name: poultry_targets[t[1]], 
               period: period,
               predict_days: predict
             })
           })
           .then(response => response.json())
-          .then(json => console.log(json))
+          .then(json => $('#list_container').html(`<img style="width:100%;margin:auto" src="http://floatflower.com.tw:9487/${json.filepath}" />` ))
           break
         case 'aquatic':
       }
@@ -149,7 +151,7 @@
         fetch('http://floatflower.com.tw:9487/api/poultry/info')
         .then(response => response.json())
         .then(json => {
-          pig_targets = json
+          poultry_targets = json
           let collapsible = document.createElement('ul')
           collapsible.classList.add('collapsible')
           collapsible.classList.add('popout')
